@@ -73,3 +73,26 @@ If the ".covers/" directory is not found, the script will test if a ".cover.jpg"
                                Delete list selected [1,2,3,4]
                                or all [A].
 ```
+
+
+
+
+### Images Examples
+
+#### Include Paths (`-add /path/to/file` or `-i /path/to/file`)
+![Include](https://raw.githubusercontent.com/gustavovalerio/GeneratorListIPTV/refs/heads/main/Imagens/Example-include.jpg)
+
+#### Lists Menu
+![Menu](https://raw.githubusercontent.com/gustavovalerio/GeneratorListIPTV/refs/heads/main/Imagens/Example-menu.jpg)
+
+#### Update List (`-u 2` or `--update 2`)
+![Update List](https://raw.githubusercontent.com/gustavovalerio/GeneratorListIPTV/refs/heads/main/Imagens/Example-update-one.jpg)
+
+#### Remove List (`-d 1` or `--delete 1`)
+![Remove List](https://raw.githubusercontent.com/gustavovalerio/GeneratorListIPTV/refs/heads/main/Imagens/Example-remove-one.jpg)
+
+#### Update All Lists (`-u A` or `--update A`)
+![Update All Lists](https://raw.githubusercontent.com/gustavovalerio/GeneratorListIPTV/refs/heads/main/Imagens/Example-update-all.jpg)
+
+#### Remove All Lists (`-d A` or `--delete A`)
+![Remove All Lists](https://raw.githubusercontent.com/gustavovalerio/GeneratorListIPTV/refs/heads/main/Imagens/Example-remove-all.jpg)
