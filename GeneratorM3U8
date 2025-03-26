@@ -18,7 +18,7 @@ if ! command -v ffprobe > /dev/null; then
     exit 1
 fi
 
-readonly VERSION='0.3.1'
+readonly VERSION='0.3.3'
 readonly ENABLE_LIST_PUBLIC='False'
 readonly DATE="$(date +%d/%m/%Y' '%H:%M)"
 
