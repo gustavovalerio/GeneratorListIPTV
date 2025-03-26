@@ -3,10 +3,22 @@
 ################################################################################
 #####  M3u8 playlist generator for SSIPTV, Perfect Player and Kodi PVR     #####
 #####  By Gustavo Valério Ferreira - gustavovalerio.com.br                 #####
-#####  Version 0.2.1 - 24/03/2025                                          #####
+#####  Version 0.3.3 - 26/03/2025                                          #####
 ################################################################################
 
-readonly VERSION='0.2.1'
+if [[ $UID -eq 0 ]]; then
+    printf '\a'
+    printf '\nCannot be run as root.\n'
+    exit 1
+fi
+
+if ! command -v ffprobe > /dev/null; then
+    printf '\a'
+    printf '\nError: No found ffprobe [ffmpeg]\n'
+    exit 1
+fi
+
+readonly VERSION='0.3.1'
 readonly ENABLE_LIST_PUBLIC='False'
 readonly DATE="$(date +%d/%m/%Y' '%H:%M)"
 
@@ -86,14 +98,26 @@ function iMsg(){
 }
 
 function detect-type-list(){
-    local -r listFiles=($(printf "%s\n" "${DIR_PUBLIC}/${1}/*"))
-    local -r listDirs=($(printf "%s\n" "${DIR_PUBLIC}/${1}/*/"))
+
+    if [[ -d "${1}/.covers/" ]]; then
+        echo f
+        return
+    fi
+
+    if [[ -f "${1}/.cover.jpg" ]]; then
+        echo d
+        return
+    fi
+
+    local -r listFiles=($(printf "%s\n" "${1}/*"))
+    local -r listDirs=($(printf "%s\n" "${1}/*/"))
 
     if [[ "${#listDirs[@]}" -ne "${#listFiles[@]}" ]]; then
         echo f
-    else
-        echo d
+        return
     fi
+
+    echo d
 }
 
 function sanitize(){
@@ -171,6 +195,7 @@ function render-files(){
             s@\,@@g
            ' $FILENAMES
 
+
     if [[ "$1" == "-d" ]]; then
         sed -i 's@^\(.*/\)\(.*/.*\)/.*$@\1\2/.cover.jpg?\2@g' $COVERPATHS
         sed -i '
@@ -185,9 +210,9 @@ function render-files(){
 }
 
 function render-list(){
-    local listType
     local msg=" +  Adding"
-    local name=$(grep -s -m1 ";${1};" $LISTS_DB | cut -d ';' -f3)
+    local listType=$(detect-type-list "$1")
+    local name=$(grep -s -m1 ";${1##*/};" $LISTS_DB | cut -d ';' -f3)
     local -l nameLower="$name"
     local pathList="${DIR_PUBLIC}/${nameLower}${LIST_EXT}"
 
@@ -195,13 +220,15 @@ function render-list(){
         msg=" *  Updating"
     fi
 
-    if [[ "$2" != "sb" ]]; then
-        listType=$(detect-type-list "$1")
-    elif [[ "$2" == "sb" ]]; then
+    if [[ "$2" == "sb" ]]; then
         pathList="$4"
         name="${1%/}"
+        msg=" * $msg"
         name="${name##*/}"
-        msg="$msg subdirectory"
+    fi
+
+    if [[ "$listType" == "d" ]] && [[ "$2" != "sb" ]]; then
+        echo
     fi
 
     echo -n "${msg} ${name}..."
@@ -211,16 +238,17 @@ function render-list(){
     fi
 
     if [[ "$listType" == "f" ]]; then
-        render-files -f "${DIR_PUBLIC}/${1}/"
+        render-files -f "${1}/"
     elif [[ "$listType" == "d" ]] && [[ "$2" != "sb" ]]; then
         echo
-        local -a dirs=($(printf "%s\n" "${DIR_PUBLIC}/${1}/*/"))
+        local -a dirs=($(printf "%s\n" "${1}/*/"))
         for dir in "${dirs[@]}"; do
             render-list "$dir" sb "$2" "$pathList"
         done
+        echo
         return
     elif [[ "$2" == "sb" ]]; then
-        render-files -d "${1}/"
+        render-files "-${listType}" "${1}/"
     fi
 
     local -a filePaths
@@ -254,7 +282,7 @@ function create-list(){
 
     echo "${1};${2};${3};${4}" >> $LISTS_DB 2>> $ERRORS_LOG
 
-    render-list "$2"
+    render-list "${DIR_PUBLIC}/${2}"
     update-main
 }
 
@@ -284,7 +312,7 @@ function update-list(){
             iMsg
             return 1
         fi
-        render-list "${key}" -u
+        render-list "${DIR_PUBLIC}/${key}" -u
 
         if [[ "$2" != "-u" ]]; then
             update-main
@@ -462,7 +490,7 @@ function get-list(){
         echo -e "\n+ [UPDATE] ${sep}${sep}--+\n"
         if [[ -z "$selected" ]]; then
             echo "   Enter the list number to update"
-            echo -e "   or press A to update everything\n"
+            echo -e "   or press A to update all\n"
             read selected
             echo
         fi
@@ -556,6 +584,12 @@ function set-m3u8-header(){
 # SERVER #######################################################################
 
 function check-server-conf() {
+
+    if ! command -v busybox > /dev/null; then
+        printf '\a'
+        printf '\nError: No found httpd [Busybox]\nInternal Server dont work.'
+    fi
+
     if   [[ ! -d ${HTTPD_DIR} ]]; then
         mkdir -p "${HTTPD_DIR}"
     fi
@@ -569,6 +603,12 @@ function check-server-conf() {
 }
 
 function start-server() {
+
+    if ! command -v busybox > /dev/null; then
+        printf '\a'
+        iMsg -n "Busybox no found. Server internal dont work.";
+    fi
+
     printf '\n'
     
     httpd -c ${HTTPD_CONF} \
@@ -577,8 +617,8 @@ function start-server() {
           
           
     if [[ "$?" == "0" ]]; then
-              iMsg -n "Server Started in ${URL_LOCAL}"
-              return
+        iMsg -n "Server Started in ${URL_LOCAL}"
+        return
     fi
     
     iMsg -n 'Server Started Failed'
@@ -591,38 +631,26 @@ function help() {
 
         -i path-to-dir,
         --add path-to-dir
-                               Adiciona um diretório à lista.
+                               Add directory to list.
 
 
         -c, --check
-                               Checa se os arquivos de configurações existem.
-                               Caso não, cria os da maneira adequada.
+                               Check config files.
 
         -s, --server
-                               Inicia um servidor http via Busybox.
+                               Start Busybox HTTP Server.
 
         -u, --update
-                               Atualiza a lista especificada (1,2,3,4)
-                               ou todas se o parâmetro for A.
+                               Update list selected [1,2,3,4]
+                               or all [A].
 
         -d, --delete
-                               Deleta a lista especificada (1,2,3,4)
-                               ou todas se o parâmetro for A.
+                               Delete list selected [1,2,3,4]
+                               or all [A].
     """
 }
 
 ################################################################################
-
-if [[ $UID -eq 0 ]]; then
-    printf '\a'
-    echo "Cannot be run as root."
-    exit 1
-fi
-
-if ! command -v ffprobe > /dev/null; then
-    iMsg -n 'No found ffprobe [ffmpeg]'
-    exit 1
-fi
 
 check-files
 echo
