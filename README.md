@@ -1,5 +1,5 @@
 # GeneratorListIPTV
-M3u8 playlist generator for SSIPTV, Perfect Player and Kodi [and compatibles] 
+M3u8 playlist generator for SSIPTV, Perfect Player and Kodi [and compatibles]  
 By Gustavo Valério -> www.gustavovalerio.com.br
 
 
