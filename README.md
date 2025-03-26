@@ -14,7 +14,7 @@ By Gustavo Valério -> www.gustavovalerio.com.br
 
 
 
-# Setting up a directory for Movies
+### Setting up a directory for Movies
 
 
 The correct structure, so that the covers are used correctly, should look like this:
@@ -26,7 +26,7 @@ The correct structure, so that the covers are used correctly, should look like t
 
 ![Movies](https://user-images.githubusercontent.com/9014758/136222345-1b4558c4-1790-40f1-b95c-30822d33ddd3.png)
  
-# Setting up a directory for your favorite series
+### Setting up a directory for your favorite series
 * The "Series" directory will contain all series directories.
 * Each series directory must contain the directories of their respective seasons.
 * Each season directory must contain a hidden "jpg" file named ".cover.jpg". This file is the cover of the season it belongs to.
@@ -35,7 +35,8 @@ The correct structure, so that the covers are used correctly, should look like t
 
 ![Series](https://github.com/valeriogustavo/valeriogustavo.github.io/blob/main/images/Series.jpg)
 
-#About Covers
+### About Covers
+
 The script defines whether it will render the directory with the settings for movies or series depending on the existence of:
 * .covers/
 * .cover.jpg
@@ -44,8 +45,8 @@ If the cover directory exists, it means that for each ".mkv" file contained in i
 
 If the ".covers/" directory is not found, the script will test if a ".cover.jpg" image exists, if it does, it will set that file as the cover for all ".mkv" files in the same directory.
 
-# To add directory
+### To add directory
 `./GeneratorM3U8 --add /path/to/directory`
 
-# To load menu
+### To load menu
 `./GeneratorM3U8`
