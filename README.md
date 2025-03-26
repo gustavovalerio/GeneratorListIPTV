@@ -48,5 +48,28 @@ If the ".covers/" directory is not found, the script will test if a ".cover.jpg"
 ### To add directory
 `./GeneratorM3U8 --add /path/to/directory`
 
-### To load menu
+### To load menu and options
 `./GeneratorM3U8`
+
+### Help on terminal
+```
+
+        -i path-to-dir,
+        --add path-to-dir
+                               Add directory to list.
+
+
+        -c, --check
+                               Check config files.
+
+        -s, --server
+                               Start Busybox HTTP Server.
+
+        -u, --update
+                               Update list selected [1,2,3,4]
+                               or all [A].
+
+        -d, --delete
+                               Delete list selected [1,2,3,4]
+                               or all [A].
+```
