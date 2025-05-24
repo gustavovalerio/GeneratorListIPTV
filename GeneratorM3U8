@@ -3,7 +3,7 @@
 ################################################################################
 #####  M3u8 playlist generator for SSIPTV, Perfect Player and Kodi PVR     #####
 #####  By Gustavo Valério Ferreira - gustavovalerio.com.br                 #####
-#####  Version 26/03/2025                                          #####
+#####  Version 0.4.2 - 24/05/2025                                          #####
 ################################################################################
 
 if [[ $UID -eq 0 ]]; then
@@ -18,7 +18,7 @@ if ! command -v ffprobe > /dev/null; then
     exit 1
 fi
 
-readonly VERSION='0.4.1'
+readonly VERSION='0.4.2'
 readonly ENABLE_LIST_PUBLIC='False'
 readonly DATE="$(date +%d/%m/%Y' '%H:%M)"
 
@@ -616,9 +616,9 @@ function start-server() {
 
     printf '\n'
     
-    httpd -c ${HTTPD_CONF} \
-          -h ${DIR_PUBLIC} \
-          -p ${IP_LOCAL}:${PORT_LOCAL}
+    busybox httpd -c ${HTTPD_CONF} \
+                  -h ${DIR_PUBLIC} \
+                  -p ${IP_LOCAL}:${PORT_LOCAL}
           
           
     if [[ "$?" == "0" ]]; then
