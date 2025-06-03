@@ -3,7 +3,7 @@
 ################################################################################
 #####  M3u8 playlist generator for SSIPTV, Perfect Player and Kodi PVR     #####
 #####  By Gustavo Valério Ferreira - gustavovalerio.com.br                 #####
-#####  Version 0.4.3 - 25/05/2025                                          #####
+#####  Version 0.4.5 - 03/06/2025                                          #####
 ################################################################################
 
 if [[ $UID -eq 0 ]]; then
@@ -18,7 +18,7 @@ if ! command -v ffprobe > /dev/null; then
     exit 1
 fi
 
-readonly VERSION='0.4.3'
+readonly VERSION='0.4.5'
 readonly ENABLE_LIST_PUBLIC='False'
 readonly DATE="$(date +%d/%m/%Y' '%H:%M)"
 
@@ -27,8 +27,8 @@ readonly DIR_CONF="${HOME}/.config/GeneratorM3U8"
 readonly ERRORS_LOG="/tmp/GeneratorM3U8.log"
 readonly LISTS_DB="${DIR_CONF}/lists.csv"
 
-readonly PORT_LOCAL='8000'
-readonly PORT_PUBLIC='9000'
+readonly PORT_LOCAL='80'
+readonly PORT_PUBLIC='80'
 
 readonly IP_LOCAL='192.168.0.254'
 readonly IP_PUBLIC='100.64.0.254'
@@ -41,14 +41,25 @@ readonly HTTPD_CONF="${HTTPD_DIR}/GeneratorM3U8.conf"
 readonly LIST_PUBLIC="${DIR_PUBLIC}/${LIST_EXT}"
 readonly LIST_LOCAL="${DIR_PUBLIC}/${MAINLIST_NAME}${LIST_EXT}"
 
-readonly URL_PUBLIC="http://${IP_PUBLIC}:${PORT_PUBLIC}"
-readonly URL_LOCAL="http://${IP_LOCAL}:${PORT_LOCAL}"
-
 readonly FILE='/tmp/generatorM3U8'
 readonly FILEPATHS='/tmp/filepaths'
 readonly FILENAMES='/tmp/filenames'
 readonly COVERPATHS='/tmp/coverpaths'
 readonly FILEDURATION='/tmp/fileduration'
+
+# SET URLS #####################################################################
+
+if [[ "${PORT_LOCAL}" == "80" || -z "${PORT_LOCAL}" ]]; then
+    readonly URL_LOCAL="http://${IP_LOCAL}"
+else
+    readonly URL_LOCAL="http://${IP_LOCAL}:${PORT_LOCAL}"
+fi
+
+if [[ "${PORT_PUBLIC}" == "80" || -z "${PORT_PUBLIC}" ]]; then
+    readonly URL_PUBLIC="http://${IP_PUBLIC}"
+else
+    readonly URL_PUBLIC="http://${IP_PUBLIC}:${PORT_PUBLIC}"
+fi
 
 # VAR UTILS ####################################################################
 
@@ -618,7 +629,7 @@ function start-server() {
     
     busybox httpd -c "${HTTPD_CONF}" \
                   -h "${DIR_PUBLIC}" \
-                  -p ${IP_LOCAL}:${PORT_LOCAL}
+                  -p "${PORT_LOCAL}"
           
           
     if [[ "$?" == "0" ]]; then
