@@ -3,7 +3,7 @@
 ################################################################################
 #####  M3u8 playlist generator for SSIPTV, Perfect Player and Kodi PVR     #####
 #####  By Gustavo Valério Ferreira - gustavovalerio.com.br                 #####
-#####  Version 0.4.5 - 03/06/2025                                          #####
+#####  Version 0.4.6 - 15/06/2025                                          #####
 ################################################################################
 
 if [[ $UID -eq 0 ]]; then
@@ -18,7 +18,7 @@ if ! command -v ffprobe > /dev/null; then
     exit 1
 fi
 
-readonly VERSION='0.4.5'
+readonly VERSION='0.4.6'
 readonly ENABLE_LIST_PUBLIC='False'
 readonly DATE="$(date +%d/%m/%Y' '%H:%M)"
 
@@ -82,8 +82,6 @@ function check-files(){
     if [[ ! -f "${LISTS_DB}" ]] || [[ "$1" == "-f" ]]; then
         echo "#ID;KEY;NAME;UPDATED" > $LISTS_DB
     fi
-    
-    check-server-conf
 }
 
 function iMsg(){
@@ -601,8 +599,8 @@ function check-server-conf() {
 
     if ! command -v busybox > /dev/null; then
         printf '\a'
-        printf '\nError: No found httpd [Busybox]\nInternal Server dont work.'
-        return
+        printf '\nError: No found httpd [Busybox]\nInternal Server dont work.\n'
+        exit 1
     fi
 
     if   [[ ! -d ${HTTPD_DIR} ]]; then
@@ -619,11 +617,7 @@ function check-server-conf() {
 
 function start-server() {
 
-    if ! command -v busybox > /dev/null; then
-        printf '\a'
-        iMsg -n "Busybox no found. Server internal dont work."
-        return
-    fi
+    check-server-conf
 
     printf '\n'
     
