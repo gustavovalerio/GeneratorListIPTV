@@ -667,11 +667,11 @@ echo
 
 case "$1" in
     -h|--help) help;;
-    -c|--check)  check-files ;;
     -s|--server) start-server ;;
     -i|--add) shift; set-list "$@" ;;
     -d|--delete) shift; delete-list "$@" ;;
     -u|--update) shift;  update-list "$@" ;;
+    -c|--check)  check-files; check-server-conf ;;
     *) get-list ;;
 esac
 
